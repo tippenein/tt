@@ -1,7 +1,9 @@
 module Main (main) where
 
+import System.IO
 import System.Environment
 import Control.Concurrent (threadDelay)
+import Control.Monad (when)
 
 import Timer
 
@@ -16,8 +18,12 @@ showCountdown t = showCountdown' $ fromT t
     threadDelay 1000000 >>
     showCountdown'(n - 1)
 
-  condP n = if n `mod` 30 == 0 then (putStr $ show n ++ "..") else return ()
+condP n = do
+  hSetBuffering stdout NoBuffering
+  when (n `mod` 30 == 0) $ do
+    print' n
 
+print' p = putStr $ show p ++ ".."
 
 parseArgs :: [String] -> T
 parseArgs [] = error "required time argument"
