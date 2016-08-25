@@ -4,32 +4,49 @@ import System.IO
 import System.Environment
 import Control.Concurrent (threadDelay)
 import Control.Monad (when)
+import Options.Applicative
 
-import Timer
+import qualified Timer
 
-fromT :: T -> Int
-fromT (T h m s) = (h * 60 * 60) + (m * 60) + s
-
-showCountdown :: T -> IO ()
-showCountdown t = showCountdown' $ fromT t
+showCountdown :: Options -> IO ()
+showCountdown o = showCountdown' (Timer.fromT $ t o) (incr o)
   where
-  showCountdown' 0 = print "done!"
-  showCountdown' n = condP n >>
-    threadDelay 1000000 >>
-    showCountdown'(n - 1)
+    showCountdown' 0 _ = print "done!"
+    showCountdown' n i = condP n i >>
+      threadDelay 1000000 >>
+      showCountdown' (n - 1) (incr o)
 
-condP n = do
+condP n i = do
   hSetBuffering stdout NoBuffering
-  when (n `mod` 30 == 0) $ do
+  when (n `mod` i == 0) $ do
     print' n
 
 print' p = putStr $ show p ++ ".."
 
-parseArgs :: [String] -> T
-parseArgs [] = error "required time argument"
-parseArgs (a:_) = toTime a
+data Options
+  = Options
+  { incr :: Int
+  , t :: Timer.T
+  }
+  
+options :: Parser Options
+options = Options
+     <$> option auto
+         ( long "increment"
+        <> short 'i'
+        <> value 30
+        <> metavar "INC"
+        <> help "how often to print the time" )
+     <*> argument (str >>= mkTime)
+         ( metavar "TIME"
+        <> help "in the format #h#m#s or similar" )
+  where
+    mkTime s = pure $ Timer.toTime s
 
 main :: IO ()
-main = do
-  a <- getArgs
-  showCountdown $ parseArgs a
+main = execParser opts >>= showCountdown
+  where
+    opts = info (helper <*> options)
+      ( fullDesc
+     <> progDesc "start a timer"
+     <> header "tt - a tea timer" )
