@@ -1,17 +1,23 @@
 module Main (main) where
 
-import System.IO
-import System.Environment
 import Control.Concurrent (threadDelay)
 import Control.Monad (when)
 import Options.Applicative
+import System.Environment
+import qualified System.Info as Sys
+import System.IO
+import qualified System.Process as Sys
 
 import qualified Timer
+
+os_speak = case Sys.os of
+             "darwin" -> "say tea is done"
+             _ -> "echo tea is done|espeak"
 
 showCountdown :: Options -> IO ()
 showCountdown o = showCountdown' (Timer.fromT $ t o) (incr o)
   where
-    showCountdown' 0 _ = print "done!"
+    showCountdown' 0 _ = print "done!" >> Sys.system os_speak >> pure ()
     showCountdown' n i = condP n i >>
       threadDelay 1000000 >>
       showCountdown' (n - 1) (incr o)
@@ -26,9 +32,9 @@ print' p = putStr $ show p ++ ".."
 data Options
   = Options
   { incr :: Int
-  , t :: Timer.T
+  , t    :: Timer.T
   }
-  
+
 options :: Parser Options
 options = Options
      <$> option auto
