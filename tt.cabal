@@ -1,5 +1,5 @@
 name: tt
-version: 0.1.0
+version: 0.2.0
 cabal-version: >=1.10
 build-type: Simple
 license: MIT
@@ -38,23 +38,3 @@ executable tt
     , tt -any
   default-language: Haskell2010
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -fno-warn-missing-signatures
-
--- test-suite tests
---   type:                exitcode-stdio-1.0
---   hs-source-dirs:      test
---   main-is:             Spec.hs
---   build-depends:
---       base -any
---     , tt -any
---     , hspec ==2.*
---     , HUnit -any
---     , QuickCheck -any
---   default-language:    Haskell2010
---   other-modules:
---       TtSpec
---   ghc-options:         -threaded -rtsopts -with-rtsopts=-N -fno-warn-missing-signatures
-
--- flag ekg
---   manual: True
---   default: False
---   description: Compile with ekg monitoring.

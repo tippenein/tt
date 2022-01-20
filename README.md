@@ -1,19 +1,14 @@
 tt
 -----
 
-[![Build Status](https://circleci.com/gh/tippenein/tt.svg?style=shield&circle-token=<TOKEN HERE>)](https://circleci.com/gh/tippenein/tt)
+tea timer
 
 ``` sh
-# Configure & build the package.
-stack build
+# install to ~/.cabal/bin
+cabal install
 
-# Test package.
-stack test
-
-# install to ~/.local/bin
-stack install
-
-
-# Start REPL.
-stack repl
+# use it
+tt 3m20s
 ```
+
+uses `espeak` to tell you when the timer is up
